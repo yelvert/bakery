@@ -1,0 +1,15 @@
+ENV['BAKERY_DEBUG'] = 'true' # TODO: Remove
+
+require 'rubygems'
+ENV['BUNDLE_GEMFILE'] ||= File.expand_path(File.join('..', 'Gemfile'), __dir__)
+require 'bundler/setup'
+bundler_groups = [:default]
+bundler_groups << :debug if ENV.member? 'BAKERY_DEBUG'
+Bundler.require(*bundler_groups)
+
+ActiveSupport::Dependencies.autoload_paths << File.expand_path(__dir__)
+$LOAD_PATH.unshift(File.expand_path(__dir__))
+
+Bakery.initialize!
+
+require_relative 'project'

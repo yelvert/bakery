@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+binstub_path = File.expand_path(File.join('bin', 'bakery'), Dir.pwd)
+project_path = File.expand_path(File.join('project.rb'), Dir.pwd)
+if File.exists?(binstub_path) && File.exists?(project_path)
+  load binstub_path
+else
+  require_relative '../lib/bakery'
+  Bakery.initialize!
+  Bakery::CLI.start(ARGV)
+end

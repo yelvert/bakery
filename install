@@ -1,0 +1,4 @@
+#! /usr/bin/env bash -l
+set -euo pipefail
+
+gem build bakery.gemspec && gem install bakery-0.0.0.gem

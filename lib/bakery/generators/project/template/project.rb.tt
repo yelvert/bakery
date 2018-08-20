@@ -1,0 +1,3 @@
+require_relative 'config/environment'
+
+<%= class_name %>::Project.new(File.expand_path(__dir__))
