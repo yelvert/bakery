@@ -2,9 +2,8 @@ module Bakery
   module Thing
     extend ActiveSupport::Autoload
     autoload :Provisioner
-    autoload :Provisioners
 
-    module Provisioners
+    module Provisioner
       class Shell < Provisioner::Base
         require 'open3'
 
@@ -12,9 +11,9 @@ module Bakery
         argument :cwd, default: Bakery.project.root
         argument :options, default: {}.with_indifferent_access
 
-        attr_reader :stdout, :stderr, :status, :results
+        attr_reader :stdout, :stderr, :status, :result
 
-        def after_run
+        def run
           run_command
         end
 
@@ -23,7 +22,7 @@ module Bakery
           def run_command
             return if @command_ran
             @stdout, @stderr, @status = Open3.capture3(command, opts)
-            @results = @stdout.strip
+            @result = @stdout.strip
           end
 
           def opts
@@ -37,9 +36,8 @@ module Bakery
           end
 
       end
+      register :shell, Shell
 
     end
   end
 end
-
-Bakery::Thing::Provisioners.register(:shell, Bakery::Thing::Provisioners::Shell)

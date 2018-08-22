@@ -1,10 +1,7 @@
 module Bakery
   module Thing
     extend ActiveSupport::Autoload
-    autoload :ProvisionerSet
-    eager_autoload do
-      autoload :Provisioners
-    end
+    autoload :Provisioner
 
     module Provisionable
       extend ActiveSupport::Concern
@@ -13,22 +10,22 @@ module Bakery
 
         class << self
 
-          def provisioners
-            @provisioners ||= ProvisionerSet.new(self)
+          def provision(description = SecureRandom.uuid, &block)
+            raise "Provisioner `#{description}` already exists for #{self}." if provision_blocks.member? description
+            provision_blocks[description] = block
           end
 
-          def provision(&block)
-            provisioners.provision_context.instance_eval &block
+          def provision_blocks
+            @provision_blocks ||= {}
           end
 
         end
 
         def provision
-          @provisioners ||= self.class.provisioners.run(self)
-        end
-
-        def provisioned?
-          @provisioners.present?
+          @provision ||= self.class.provision_blocks.inject({}) do |memo, pair|
+            description, block = pair
+            memo.merge! description => Provisioner::Context.new(self, description, &block)
+          end
         end
 
       end

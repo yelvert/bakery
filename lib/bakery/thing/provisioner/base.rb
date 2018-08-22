@@ -28,30 +28,31 @@ module Bakery
 
         end
 
-        attr_reader :thing, :name, :args, :run_block
+        attr_reader :thing, :context, :name, :args, :run_block
 
-        def initialize(thing, name, *args, &block)
+        def initialize(thing, context, name, *args, &block)
           @thing = thing
+          @context = context
           @name = name
           @args = args
           self.class.arguments.each do |arg, options|
             value = args[self.class.argument_index(arg)] || options[:default]
             send(arg, value)
           end
-          @run_block = block
+          instance_eval(&block) if block_given?
         end
 
-        def execute_run_block
-          instance_eval(&run_block) if run_block.present?
-        end
+        alias_method :provision, :context
 
-        def run
-          execute_run_block
-          after_run
-          self
-        end
+        def run ; end
 
-        def after_run ; end
+        def method_missing(method, *args, &block)
+          if context.respond_to? method
+            context.send(method, *args, &block)
+          else
+            super
+          end
+        end
 
       end
 

@@ -2,10 +2,9 @@ module Bakery
   module Thing
     extend ActiveSupport::Autoload
     autoload :Provisioner
-    autoload :Provisioners
 
-    module Provisioners
-      class Log < Provisioner::Base
+    module Provisioner
+      class Log < Base
 
         argument :status, default: :log
         argument :message, default: ''
@@ -22,7 +21,7 @@ module Bakery
           (message || '').to_s.prepend(tags.map{|tag| "[#{tag}]"}.join(' ')+' ')
         end
 
-        def after_run
+        def run
           puts full_message
         end
 
@@ -41,9 +40,8 @@ module Bakery
           end
 
       end
+      register :log, Log
 
     end
   end
 end
-
-Bakery::Thing::Provisioners.register(:log, Bakery::Thing::Provisioners::Log)

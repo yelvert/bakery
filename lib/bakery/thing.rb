@@ -3,7 +3,7 @@ module Bakery
     extend ActiveSupport::Autoload
     autoload :Base
 
-    Bakery::Thing::Provisioners.eager_load!
+    Bakery::Thing::Provisioner.eager_load!
 
   end
 end
