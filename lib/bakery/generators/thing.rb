@@ -14,7 +14,7 @@ module Bakery
                 type: :hash
 
       def thing_file
-        template File.join('templates', 'thing.rb.tt'), destination.join('things', "#{underscored_name}.rb")
+        template File.join('templates', 'thing.rb.tt'), destination.join('things', "#{underscored_name}_thing.rb")
       end
 
       no_commands do

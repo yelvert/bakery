@@ -4,6 +4,7 @@ module Bakery
       extend ActiveSupport::Autoload
       eager_autoload do
         autoload :Log
+        autoload :Shell
       end
 
       class Context
@@ -16,7 +17,7 @@ module Bakery
       def register(method, klass)
         base_klass = Bakery::Thing::Provisioner::Base
         raise "Only descendants of #{base_klass} may be registered as a Provisioner" unless klass < base_klass
-        Context.send(:define_method, method) do |name = Time.now.to_s.gsub(/[^\d]/,'_'), *args, &block|
+        Context.send(:define_method, method) do |name = nil, *args, &block|
           thing_klass.provisioners.add(name, klass, *args, &block)
         end
       end

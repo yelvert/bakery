@@ -9,9 +9,9 @@ module Bakery
       class ProvisionerSetItem
         attr_reader :name, :klass, :args, :run_block
         def initialize(name, klass, *args, &block)
-          @name = name
+          @name = name || Time.now.to_s.gsub(/[^\d]/,'_')
           @klass = klass
-          @args = @args
+          @args = args
           @run_block = block
         end
 

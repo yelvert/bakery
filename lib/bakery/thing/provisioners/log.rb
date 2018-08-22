@@ -7,10 +7,38 @@ module Bakery
     module Provisioners
       class Log < Provisioner::Base
 
-        def run
-          @message ||= super
-          puts (@message || '').to_s.prepend("[#{Time.now}] [#{name}] ")
+        argument :status, default: :log
+        argument :message, default: ''
+
+        def tags
+          [default_tags, status, added_tags].flatten
         end
+
+        def tag(value)
+          added_tags << value
+        end
+
+        def full_message
+          (message || '').to_s.prepend(tags.map{|tag| "[#{tag}]"}.join(' ')+' ')
+        end
+
+        def after_run
+          puts full_message
+        end
+
+        private
+
+          def default_tags
+            @default_tags ||= [
+              Time.now,
+              name,
+              *(args[2..-1] || [])
+            ]
+          end
+
+          def added_tags
+            @added_tags ||= []
+          end
 
       end
 
