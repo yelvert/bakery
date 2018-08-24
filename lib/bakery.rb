@@ -10,6 +10,10 @@ if ENV.member? 'BAKERY_DEBUG'
   require 'pry-doc'
   require 'pry-nav'
   require 'pry-remote'
+  Pry.config.exception_handler = proc do |output, exception, _|
+    output.puts "#{exception.class}: #{exception.message}"
+    output.puts exception.backtrace.join("\n")
+  end
 end
 
 # bundler_groups = [:default]
@@ -17,7 +21,7 @@ end
 # Bundler.require(*bundler_groups)
 require 'thor'
 require 'active_support'
-require 'active_support/core_ext/hash/indifferent_access'
+require 'active_support/core_ext'
 ActiveSupport::Dependencies.autoload_paths << File.expand_path(__dir__)
 $LOAD_PATH.unshift(File.expand_path(__dir__))
 

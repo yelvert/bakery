@@ -5,11 +5,50 @@ module Bakery
       autoload :Base
 
       class Vagrant < Base
-        argument :directory
+        argument :directory, :path
 
         def run
-          provision.log(:vagrant_test, directory)
+          verify_directory!
+          this = self
+          log_tag = "Vagrant: #{this.name}"
+          context.log do
+            tag log_tag
+            message "Directory: #{this.directory}"
+          end
+          vagrant_command = context.shell do
+            cwd this.directory
+            command "vagrant status"
+          end
+          if vagrant_command.stderr.present?
+            context.log do
+              status :error
+              tag log_tag
+              message vagrant_command.stderr
+            end
+          end
+          if vagrant_command.stdout.present?
+            context.log do
+              status :info
+              tag log_tag
+              message vagrant_command.stdout
+            end
+          end
         end
+
+        private
+
+          def verify_directory!
+            unless directory.directory?
+              raise "#{self.class.class_name}'s `directory` must be a valid directory'"
+            end
+            unless vagrant_file_path.file?
+              raise "#{self.class.class_name}'s `directory` must include a Vagrantfile"
+            end
+          end
+
+          def vagrant_file_path
+            directory.join('Vagrantfile')
+          end
 
       end
       register :vagrant, Vagrant

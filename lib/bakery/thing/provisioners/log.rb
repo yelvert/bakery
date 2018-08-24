@@ -6,8 +6,8 @@ module Bakery
     module Provisioner
       class Log < Base
 
-        argument :status, default: :log
-        argument :message, default: ''
+        argument :status, :symbol, default: :info
+        argument :message, :string, default: ''
 
         def tags
           [default_tags, status, added_tags].flatten
@@ -18,7 +18,7 @@ module Bakery
         end
 
         def full_message
-          (message || '').to_s.prepend(tags.map{|tag| "[#{tag}]"}.join(' ')+' ')
+          (message || '').to_s.gsub(/^/, tag_str+' ')
         end
 
         def run
@@ -37,6 +37,10 @@ module Bakery
 
           def added_tags
             @added_tags ||= []
+          end
+
+          def tag_str
+            tags.map{|tag| "[#{tag}]"}.join(' ')
           end
 
       end

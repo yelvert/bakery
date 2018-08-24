@@ -17,9 +17,10 @@ module Bakery
         raise "Only descendants of #{base_klass} may be registered as a Provisioner" unless klass < base_klass
         Context.send(:define_method, method) do |name = SecureRandom.uuid, *args, &block|
           raise "Provisioner named #{name} already exists." if provisioners.member? name
-          provisioners[name] = klass.new(thing, self, name, *args, &block)
-          provisioners[name].run
-          provisioners[name]
+          provisioner = klass.new(thing, self, name, *args, &block)
+          provisioners[name] = provisioner
+          provisioner.run
+          provisioner
         end
       end
       module_function :register
