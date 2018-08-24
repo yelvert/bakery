@@ -11,23 +11,23 @@ module Bakery
           verify_directory!
           this = self
           log_tag = "Vagrant: #{this.name}"
-          context.log do
+          log do
             tag log_tag
             message "Directory: #{this.directory}"
           end
-          vagrant_command = context.shell do
+          vagrant_command = shell do
             cwd this.directory
             command "vagrant status"
           end
           if vagrant_command.stderr.present?
-            context.log do
+            log do
               status :error
               tag log_tag
               message vagrant_command.stderr
             end
           end
           if vagrant_command.stdout.present?
-            context.log do
+            log do
               status :info
               tag log_tag
               message vagrant_command.stdout

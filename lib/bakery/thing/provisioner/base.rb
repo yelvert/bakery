@@ -35,7 +35,9 @@ module Bakery
 
         attr_reader :thing, :context, :name, :args, :run_block
 
-        def initialize(thing, context, name, *args, &block)
+        delegate :provisioner_chain, :parent_provisioner, to: :context
+
+        def initialize(thing, context, name, *args)
           @thing = thing
           @context = context
           @name = name
@@ -48,6 +50,9 @@ module Bakery
             }` Argument `#{arg}` may not be nil" if value.nil? || options[:allow_nil]
             send(arg, value)
           end
+        end
+
+        def execute(&block)
           instance_eval(&block) if block_given?
         end
 
@@ -125,14 +130,6 @@ module Bakery
               raise "Provided value for Provisioner `#{self.class.class_name}`'s argument `#{name}` must be a Path"
             end
             instance_variable_set :"@#{name}", value
-          end
-        end
-
-        def method_missing(method, *args, &block)
-          if context.respond_to? method
-            context.send(method, *args, &block)
-          else
-            super
           end
         end
 
