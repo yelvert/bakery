@@ -58,18 +58,18 @@ module Bakery
 
         def run ; end
 
-        def __argument_default(value = :__GETTER__)
+        def __argument_default(value = getter = true)
           name = __callee__
-          if value === :__GETTER__
+          if getter
             instance_variable_get :"@#{name}"
           else
             instance_variable_set :"@#{name}", value
           end
         end
 
-        def __argument_string(value = :__GETTER__)
+        def __argument_string(value = getter = true)
           name = __callee__
-          if value === :__GETTER__
+          if getter
             instance_variable_get :"@#{name}"
           else
             if value.respond_to?(:to_s)
@@ -80,9 +80,9 @@ module Bakery
           end
         end
 
-        def __argument_symbol(value = :__GETTER__)
+        def __argument_symbol(value = getter = true)
           name = __callee__
-          if value === :__GETTER__
+          if getter
             instance_variable_get :"@#{name}"
           else
             if value.respond_to?(:to_sym)
@@ -93,9 +93,9 @@ module Bakery
           end
         end
 
-        def __argument_array(value = :__GETTER__)
+        def __argument_array(value = getter = true)
           name = __callee__
-          if value === :__GETTER__
+          if getter
             instance_variable_get :"@#{name}"
           else
             if value.is_a?(Array)
@@ -106,9 +106,9 @@ module Bakery
           end
         end
 
-        def __argument_hash(value = :__GETTER__)
+        def __argument_hash(value = getter = true)
           name = __callee__
-          if value === :__GETTER__
+          if getter
             instance_variable_get :"@#{name}"
           else
             if value.is_a?(Hash)
@@ -119,9 +119,9 @@ module Bakery
           end
         end
 
-        def __argument_path(value = :__GETTER__)
+        def __argument_path(value = getter = true)
           name = __callee__
-          if value === :__GETTER__
+          if getter
             instance_variable_get :"@#{name}"
           else
             begin
@@ -130,6 +130,21 @@ module Bakery
               raise "Provided value for Provisioner `#{self.class.class_name}`'s argument `#{name}` must be a Path"
             end
             instance_variable_set :"@#{name}", value
+          end
+        end
+
+        def __argument_block(value = getter = true, &block)
+          name = __callee__
+          if getter && !block_given?
+            instance_variable_get :"@#{name}"
+          else
+            if block_given?
+              instance_variable_set :"@#{name}", block
+            elsif value.is_a? Proc
+              instance_variable_set :"@#{name}", value
+            else
+              raise "Provided value for Provisioner `#{self.class.class_name}`'s argument `#{name}` must be a Proc, lambda, or block"
+            end
           end
         end
 

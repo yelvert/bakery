@@ -14,6 +14,7 @@ if ENV.member? 'BAKERY_DEBUG'
     output.puts "#{exception.class}: #{exception.message}"
     output.puts exception.backtrace.join("\n")
   end
+  Pry.config.history.file = Pathname.pwd.expand_path.join('.irb_history').to_s
 end
 
 # bundler_groups = [:default]

@@ -7,32 +7,34 @@ module Bakery
       class Vagrant < Base
         argument :directory, :path
 
+        def log_tag ; "Vagrant: #{name}" ; end
+
         def run
           verify_directory!
           this = self
-          log_tag = "Vagrant: #{this.name}"
           log do
-            tag log_tag
+            tag this.log_tag
             message "Directory: #{this.directory}"
           end
           vagrant_command = shell do
             cwd this.directory
             command "vagrant status"
           end
-          if vagrant_command.stderr.present?
-            log do
-              status :error
-              tag log_tag
-              message vagrant_command.stderr
-            end
-          end
-          if vagrant_command.stdout.present?
-            log do
-              status :info
-              tag log_tag
-              message vagrant_command.stdout
-            end
-          end
+          # binding.pry
+          # if vagrant_command.stderr.present?
+          #   log do
+          #     status :error
+          #     tag log_tag
+          #     message vagrant_command.stderr
+          #   end
+          # end
+          # if vagrant_command.stdout.present?
+          #   log do
+          #     status :info
+          #     tag log_tag
+          #     message vagrant_command.stdout
+          #   end
+          # end
         end
 
         private
