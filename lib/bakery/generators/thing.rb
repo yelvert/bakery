@@ -11,7 +11,8 @@ module Bakery
       argument  :attributes,
                 desc: 'The Things attributes',
                 required: false,
-                type: :hash
+                type: :hash,
+                default: {}.with_indifferent_access
 
       def thing_file
         template File.join('templates', 'thing.rb.tt'), destination.join('things', "#{underscored_name}_thing.rb")

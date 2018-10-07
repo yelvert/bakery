@@ -49,7 +49,7 @@ module Bakery
 
         end
 
-        def initialize(attrs = {})
+        def initialize(**attrs)
           attrs = attrs.with_indifferent_access
           self.attribute_names.each do |name|
             send :"#{name}=", attrs[name]

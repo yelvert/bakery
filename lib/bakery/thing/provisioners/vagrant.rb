@@ -5,7 +5,9 @@ module Bakery
       autoload :Base
 
       class Vagrant < Base
-        argument :directory, :path
+        argument(:directory, :path) do
+          Bakery.project.root.join('things', self.thing.class.to_s.underscore, 'vagrant')
+        end
 
         def log_tag ; "Vagrant: #{name}" ; end
 

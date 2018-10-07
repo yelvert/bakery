@@ -7,11 +7,13 @@ module Bakery
       class Shell < Provisioner::Base
         require 'open3'
 
-        argument :command, :string, default: ''
-        argument :cwd, :path, default: Bakery.project.try(:root) || Bakery.root
-        argument :options, :hash, default: {}.with_indifferent_access
-        argument :on_stdout, :block, default: ->(line) {}
-        argument :on_stderr, :block, default: ->(line) {}
+        argument(:command, :string) { '' }
+        argument(:cwd, :path) { Bakery.project.try(:root) || Bakery.root }
+        argument(:log_output, :boolean) { true }
+        argument(:log_tags, :array) { [] }
+        argument(:options, :hash) { {}.with_indifferent_access }
+        argument(:on_stdout, :block)
+        argument(:on_stderr, :block)
 
         def run
           run_command
@@ -27,12 +29,8 @@ module Bakery
 
         private
 
-          def log?
-            !!( options.with_indifferent_access.fetch(:log) { true } )
-          end
-
-          def log_tags(*additional)
-            Array( options.with_indifferent_access.fetch(:log_tags) { [] } ) + additional
+          def full_log_tags(*additional)
+            Array(log_tags) + additional
           end
 
           def run_command
@@ -49,8 +47,10 @@ module Bakery
                 Thread.new do
                   until (line = stream.gets).nil? do
                     if key == :out
+                      stdout_lines << line
                       execute_on_stdout line
                     else
+                      stderr_lines << line
                       execute_on_stderr line
                     end
                   end
@@ -61,10 +61,10 @@ module Bakery
           end
 
           def execute_on_stdout(line)
-            if log?
+            if log_output?
               this = self
               log do
-                this.send(:log_tags, :stdout).each(&method(:tag))
+                this.send(:full_log_tags, :stdout).each(&method(:tag))
                 message line
               end
             end
@@ -72,10 +72,10 @@ module Bakery
           end
 
           def execute_on_stderr(line)
-            if log?
+            if log_output?
               this = self
               log do
-                this.send(:log_tags, :stderr).each(&method(:tag))
+                this.send(:full_log_tags, :stderr).each(&method(:tag))
                 message line
               end
             end

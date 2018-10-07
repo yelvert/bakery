@@ -6,8 +6,8 @@ module Bakery
     module Provisioner
       class Log < Base
 
-        argument :status, :symbol, default: :info
-        argument :message, :string, default: ''
+        argument(:status, :symbol) { :info }
+        argument(:message, :string) { '' }
 
         def tags
           [default_tags, status, added_tags].flatten
@@ -30,7 +30,6 @@ module Bakery
           def default_tags
             @default_tags ||= [
               Time.now,
-              name,
               *(args[2..-1] || [])
             ]
           end

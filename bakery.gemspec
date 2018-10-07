@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'thor'
   s.add_runtime_dependency 'activesupport'
+  s.add_runtime_dependency 'down'
 
   s.add_development_dependency 'pry'
   s.add_development_dependency 'pry-doc'
