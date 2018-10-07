@@ -62,24 +62,18 @@ module Bakery
 
           def execute_on_stdout(line)
             if log_output?
-              this = self
-              log do
-                this.send(:full_log_tags, :stdout).each(&method(:tag))
-                message line
-              end
+              log(line, :stdout) if log_output?
             end
             instance_exec(line, &on_stdout) if on_stdout.is_a? Proc
           end
 
           def execute_on_stderr(line)
-            if log_output?
-              this = self
-              log do
-                this.send(:full_log_tags, :stderr).each(&method(:tag))
-                message line
-              end
-            end
+            log(line, :stderr) if log_output?
             instance_exec(line, &on_stderr) if on_stderr.is_a? Proc
+          end
+
+          def log(message, out)
+            p.log(status: out, tags: full_log_tags, message: message)
           end
 
       end

@@ -6,7 +6,7 @@ module Bakery
         def initialize(thing, description, &block)
           @thing = thing
           @description = description
-          instance_eval &block
+          yield(self, thing)
         end
 
         def provisioner_chain

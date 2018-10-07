@@ -25,17 +25,11 @@ module Bakery
           this = self
 
           if dest.present? && dest.file? && !force?
-            log do
-              this.send(:full_log_tags).each(&method(:tag))
-              message 'Skipping download: already exists'
-            end
+            log 'Skipping download: already exists'
             return
           end
 
-          log do
-            this.send(:full_log_tags).each(&method(:tag))
-            message 'Starting download'
-          end
+          log 'Starting download'
 
           @tempfile = Down.download(
             url,
@@ -43,33 +37,17 @@ module Bakery
             progress_proc: method(:execute_on_progress),
           )
 
-          log do
-            this.send(:full_log_tags).each(&method(:tag))
-            message 'Finished downloading file'
-          end
+          log 'Finished downloading file'
 
           if dest.present? or dest_dir.present?
-            log do
-              this.send(:full_log_tags).each(&method(:tag))
-              message 'Moving file to destination'
-            end
+            log 'Moving file to destination'
             dest_dir.mkpath if dest_dir.present?
-            binding.pry
-            destination
             FileUtils.move(tempfile, destination, force: true)
-            unless destination.file?
-              raise DestError.new(self, :mv_fail)
-            end
-            log do
-              this.send(:full_log_tags).each(&method(:tag))
-              message 'Finished moving file to destination'
-            end
+            raise DestError.new(self, :mv_fail) unless destination.file?
+            log 'Finished moving file to destination'
           end
 
-          log do
-            this.send(:full_log_tags).each(&method(:tag))
-            message 'Download Finished'
-          end
+          log 'Download Finished'
         end
 
         def destination
@@ -100,14 +78,14 @@ module Bakery
             Array(log_tags) + [log_tag] + additional
           end
 
+          def log(message, status = :info)
+            p.log(status: status, tags: full_log_tags, message: message)
+          end
+
           def execute_content_length(content_length)
             return unless content_length.present?
             @content_length = content_length
-            this = self
-            log do
-              this.send(:full_log_tags).each(&method(:tag))
-              message "Content Length: #{this.content_length}"
-            end
+            log "Content Length: #{self.content_length}"
           end
 
           def execute_on_progress(progress)
@@ -117,11 +95,7 @@ module Bakery
               current_progress = ((progress.to_f / content_length)*100).round
               # puts "#{current_progress} = #{progress} / #{content_length}"
               if current_progress - @_last_log_progress >= log_steps
-                this = self
-                log do
-                  this.send(:full_log_tags, :progress).each(&method(:tag))
-                  message "#{current_progress}%"
-                end
+                log "#{current_progress}%"
                 @_last_log_progress = current_progress
               end
             end

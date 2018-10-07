@@ -9,19 +9,10 @@ module Bakery
           Bakery.project.root.join('things', self.thing.class.to_s.underscore, 'vagrant')
         end
 
-        def log_tag ; "Vagrant: #{name}" ; end
-
         def run
           verify_directory!
-          this = self
-          log do
-            tag this.log_tag
-            message "Directory: #{this.directory}"
-          end
-          vagrant_command = shell do
-            cwd this.directory
-            command "vagrant status"
-          end
+          log("Directory: #{directory}")
+          vagrant_command = p.shell(cwd: directory, command: "vagrant status")
           # binding.pry
           # if vagrant_command.stderr.present?
           #   log do
@@ -52,6 +43,12 @@ module Bakery
 
           def vagrant_file_path
             directory.join('Vagrantfile')
+          end
+
+          def log_tag ; "Vagrant: #{name}" ; end
+
+          def log(message, status = :info)
+            p.log(status: status, message: message, tag: log_tag)
           end
 
       end

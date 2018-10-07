@@ -19,7 +19,6 @@ module Bakery
         Context.send(:define_method, method) do |**args, &block|
           provision(klass, thing, **args, &block)
         end
-        Base.send(:delegate, method, to: :context)
       end
       module_function :register
     end

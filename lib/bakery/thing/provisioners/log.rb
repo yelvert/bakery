@@ -8,14 +8,8 @@ module Bakery
 
         argument(:status, :symbol) { :info }
         argument(:message, :string) { '' }
-
-        def tags
-          [default_tags, status, added_tags].flatten
-        end
-
-        def tag(value)
-          added_tags << value
-        end
+        argument(:tag, :string)
+        argument(:tags, :array) { [] }
 
         def full_message
           (message || '').to_s.gsub(/^/, tag_str+' ')
@@ -34,12 +28,16 @@ module Bakery
             ]
           end
 
+          def all_tags
+            [default_tags, status, tag, tags].flatten.compact
+          end
+
           def added_tags
             @added_tags ||= []
           end
 
           def tag_str
-            tags.map{|tag| "[#{tag}]"}.join(' ')
+            all_tags.map{|tag| "[#{tag}]"}.join(' ')
           end
 
       end

@@ -7,7 +7,6 @@ module Bakery
 
           def argument(name, type = :default, options = {}, &block)
             name = name.to_sym || raise("Provisioner Argument name must be a string or symbol, but was: #{name}")
-            arguments.member?(name) && raise("Provisioner Argument `#{name}` already exists")
             argument_types.include?(type) || raise("Provisioner Argument type `#{type}` is not a valid. Options are #{argument_types.join(', ')}.")
             options = options.with_indifferent_access
             options[:type] = type
@@ -24,7 +23,7 @@ module Bakery
           end
 
           def argument_types
-            instance_methods.
+            @_argument_types ||= instance_methods.
               inject([]) do |memo, method|
                 memo << method.to_s.sub(/^__argument_/, '').to_sym if method.to_s.starts_with? '__argument_'
                 memo
@@ -53,6 +52,8 @@ module Bakery
             send(arg, value) unless value.nil?
           end
         end
+
+        def p ; context ; end
 
         def execute(&block)
           instance_eval(&block) if block_given?
