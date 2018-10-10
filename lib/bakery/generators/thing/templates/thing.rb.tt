@@ -1,4 +1,4 @@
-class <%= class_name %> < Bakery::Thing::Base
+class <%= class_name %>Thing < Bakery::Thing::Base
 <% attributes.each do |name, type| -%>
   attribute :<%= name %>, :<%= type %>
 <% end -%>

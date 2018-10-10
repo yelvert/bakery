@@ -77,7 +77,7 @@ module Bakery
           end
 
       end
-      register :shell, Shell
+      register Shell
 
     end
   end

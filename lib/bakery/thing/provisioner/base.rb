@@ -5,6 +5,15 @@ module Bakery
 
         class << self
 
+          def name(value = getter = true)
+            if getter
+              @name
+            else
+              raise "Provisioner class name must be a string." unless value.is_a?(String)
+              @name = value
+            end
+          end
+
           def argument(name, type = :default, options = {}, &block)
             name = name.to_sym || raise("Provisioner Argument name must be a string or symbol, but was: #{name}")
             argument_types.include?(type) || raise("Provisioner Argument type `#{type}` is not a valid. Options are #{argument_types.join(', ')}.")
@@ -19,6 +28,7 @@ module Bakery
           def arguments ; @_arguments ||= {}.with_indifferent_access ; end
 
           def inherited(child_class)
+            child_class.name child_class.to_s.split('::').last.underscore
             child_class.arguments.reverse_merge!(arguments)
           end
 
@@ -29,6 +39,10 @@ module Bakery
                 memo
               end.
               without(:default)
+          end
+
+          def helper_path
+            Bakery.project.root.join('.bakery', 'provisioner_helpers')
           end
 
         end
@@ -199,6 +213,12 @@ module Bakery
         end
 
         argument(:name, :string) { SecureRandom.uuid }
+
+        private
+
+          def helper_path
+            self.class.helper_path.join(self.class.name)
+          end
 
       end
 

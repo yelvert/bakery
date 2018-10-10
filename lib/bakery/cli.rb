@@ -27,6 +27,19 @@ module Bakery
     end
     map 'r' => :runner
 
+    desc 'provision THING ATTRS', 'Provision a thing'
+    def provision(thing_type, *command_argv)
+      thing_class_name = "#{thing_type.classify}Thing"
+      thing_class = thing_class_name.constantize
+      raise "THING_CLASS is not a Thing: #{thing_class}" unless thing_class < Bakery::Thing::Base
+      attrs = command_argv.inject({}) do |h, arg|
+        key, value = arg.split(':', 2)
+        h.merge(key => value)
+      end
+      thing_class.new(**attrs).provision
+    end
+    map 'p' => :provision
+
   end
 end
 

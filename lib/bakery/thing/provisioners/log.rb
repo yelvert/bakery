@@ -41,7 +41,7 @@ module Bakery
           end
 
       end
-      register :log, Log
+      register Log
 
     end
   end

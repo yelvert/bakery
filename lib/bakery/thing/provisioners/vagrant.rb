@@ -52,7 +52,7 @@ module Bakery
           end
 
       end
-      register :vagrant, Vagrant
+      register Vagrant
 
     end
   end

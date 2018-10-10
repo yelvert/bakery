@@ -126,7 +126,7 @@ module Bakery
         end
 
       end
-      register :download, Download
+      register Download
 
     end
   end
